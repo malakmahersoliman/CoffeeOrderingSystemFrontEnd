@@ -1,0 +1,145 @@
+<h1 class="page-title">Create Order</h1>
+<p class="page-subtitle">Follow the 3 steps below: pick a customer, choose items, then review and place the order.</p>
+
+@if (loading()) {
+  <app-skeleton />
+} @else if (success()) {
+  <div class="success-state">
+    <div class="success-icon"><app-icon name="check" size="lg" /></div>
+    <h2>Order placed successfully</h2>
+    <p>Order #{{ placedOrderId() }} has been saved. You can view it in Coffee Orders.</p>
+    <div class="success-actions">
+      <app-btn [link]="'/orders/' + placedOrderId()!">View Order</app-btn>
+      <app-btn variant="secondary" (click)="reset()">Create Another</app-btn>
+    </div>
+  </div>
+} @else {
+  <div class="steps">
+    <div class="step" [class.active]="step() >= 1" [class.done]="step() > 1">Step 1 — Customer</div>
+    <div class="step" [class.active]="step() >= 2" [class.done]="step() > 2">Step 2 — Menu Items</div>
+    <div class="step" [class.active]="step() >= 3">Step 3 — Summary</div>
+  </div>
+
+  @if (step() === 1) {
+    <section class="step-panel">
+      <div class="step-header">
+        <h3>Select a customer</h3>
+        <app-btn variant="secondary" size="sm" (click)="showAddCustomer.set(true)">Add Customer</app-btn>
+      </div>
+      <app-search-input
+        placeholder="Search by name or phone..."
+        [value]="customerSearch()"
+        (valueChange)="customerSearch.set($event)"
+      />
+      <div class="select-list">
+        @for (customer of filteredCustomers(); track customer.id) {
+          <button
+            type="button"
+            class="select-item"
+            [class.selected]="selectedCustomerId() === customer.id"
+            (click)="selectCustomer(customer.id)"
+          >
+            <strong>{{ customer.fullName }}</strong>
+            <span>{{ customer.phoneNumber }}</span>
+          </button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (step() === 2) {
+    <section class="step-panel">
+      <h3>Select menu items</h3>
+      <p class="help-text">Use + and - to set quantity. Unavailable items cannot be added.</p>
+      <app-search-input placeholder="Search menu..." [value]="menuSearch()" (valueChange)="menuSearch.set($event)" />
+      <div class="menu-picker-grid">
+        @for (item of filteredMenu(); track item.id) {
+          <article class="picker-card" [class.unavailable]="!item.isAvailable">
+            <div class="picker-top">
+              <app-icon name="cup" />
+              <app-badge
+                [label]="item.isAvailable ? 'Available' : 'Unavailable'"
+                [variant]="item.isAvailable ? 'success' : 'danger'"
+              />
+            </div>
+            <h4>{{ item.name }}</h4>
+            <p>{{ item.category }} · {{ item.price | currency }}</p>
+            <div class="qty-control">
+              <button type="button" (click)="changeQty(item, -1)" [disabled]="getQty(item.id) === 0">-</button>
+              <span>{{ getQty(item.id) }}</span>
+              <button type="button" (click)="changeQty(item, 1)" [disabled]="!item.isAvailable">+</button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  @if (step() === 3) {
+    <section class="step-panel">
+      <h3>Review order</h3>
+      <div class="summary-customer">
+        <strong>{{ selectedCustomer()?.fullName }}</strong>
+        <span>{{ selectedCustomer()?.phoneNumber }}</span>
+      </div>
+      <label class="takeaway-toggle">
+        <input type="checkbox" [checked]="isTakeAway()" (change)="isTakeAway.set($any($event.target).checked)" />
+        This is a take-away order
+      </label>
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (line of cart(); track line.menuItem.id) {
+            <tr>
+              <td>{{ line.menuItem.name }}</td>
+              <td>{{ line.quantity }}</td>
+              <td>{{ line.menuItem.price | currency }}</td>
+              <td>{{ line.menuItem.price * line.quantity | currency }}</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><strong>Total</strong></td>
+            <td><strong>{{ grandTotal() | currency }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </section>
+  }
+
+  <div class="step-nav">
+    @if (step() > 1) {
+      <app-btn variant="secondary" (click)="prevStep()">Back</app-btn>
+    }
+    @if (step() < 3) {
+      <app-btn (click)="nextStep()">Continue</app-btn>
+    } @else {
+      <app-btn [loading]="placing()" (click)="placeOrder()">Place Order</app-btn>
+    }
+  </div>
+}
+
+<app-modal [open]="showAddCustomer()" title="Add Customer" (closed)="showAddCustomer.set(false)">
+  <form [formGroup]="customerForm">
+    <div class="form-field">
+      <label>Full Name</label>
+      <input formControlName="fullName" />
+    </div>
+    <div class="form-field">
+      <label>Phone Number</label>
+      <input formControlName="phoneNumber" />
+    </div>
+  </form>
+  <div modal-footer>
+    <app-btn variant="secondary" (click)="showAddCustomer.set(false)">Cancel</app-btn>
+    <app-btn (click)="saveCustomer()">Save</app-btn>
+  </div>
+</app-modal>

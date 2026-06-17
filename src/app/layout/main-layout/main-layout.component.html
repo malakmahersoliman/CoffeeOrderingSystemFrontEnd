@@ -1,0 +1,41 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <app-icon name="cup" />
+      </div>
+      <div>
+        <strong>Coffee Shop</strong>
+        <small>Staff Panel</small>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of navItems; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+        >
+          <app-icon [name]="item.icon" />
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <div class="main-area">
+    <header class="top-header">
+      <div>
+        <p class="header-date">{{ today }}</p>
+        <h2>Staff Dashboard</h2>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<app-toast-container />

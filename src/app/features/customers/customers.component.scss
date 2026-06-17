@@ -1,0 +1,65 @@
+.card-table {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0.85rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--surface-soft);
+  }
+
+  tbody tr:hover {
+    background: var(--surface-soft);
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.form-field {
+  margin-bottom: 0.9rem;
+
+  label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+    color: var(--text);
+  }
+
+  input {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    outline: none;
+
+    &:focus {
+      border-color: var(--primary);
+    }
+  }
+
+  .error {
+    display: block;
+    color: var(--danger);
+    font-size: 0.78rem;
+    margin-top: 0.3rem;
+  }
+}

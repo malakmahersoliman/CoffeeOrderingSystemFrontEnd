@@ -1,0 +1,96 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Menu Items</h1>
+    <p class="page-subtitle">Add and manage drinks on your menu. Set price and availability for each item.</p>
+  </div>
+  <div class="page-actions">
+    <app-search-input placeholder="Search menu..." [value]="search()" (valueChange)="search.set($event)" />
+    <app-btn (click)="openAdd()">Add Menu Item</app-btn>
+  </div>
+</div>
+
+<div class="filters-row">
+  <select [value]="categoryFilter()" (change)="categoryFilter.set($any($event.target).value)">
+    <option value="all">All Categories</option>
+    @for (cat of categories(); track cat) {
+      <option [value]="cat">{{ cat }}</option>
+    }
+  </select>
+  <select [value]="availabilityFilter()" (change)="availabilityFilter.set($any($event.target).value)">
+    <option value="all">All Availability</option>
+    <option value="available">Available</option>
+    <option value="unavailable">Unavailable</option>
+  </select>
+</div>
+
+@if (loading()) {
+  <app-skeleton />
+} @else if (filtered().length === 0) {
+  <app-empty-state icon="cup" title="No menu items" message="Add your first drink to the menu.">
+    <app-btn (click)="openAdd()">Add Menu Item</app-btn>
+  </app-empty-state>
+} @else {
+  <div class="menu-grid">
+    @for (item of filtered(); track item.id) {
+      <article class="menu-card">
+        <div class="menu-image"><app-icon name="cup" /></div>
+        <div class="menu-body">
+          <div class="menu-top">
+            <h3>{{ item.name }}</h3>
+            <app-badge
+              [label]="item.isAvailable ? 'Available' : 'Unavailable'"
+              [variant]="item.isAvailable ? 'success' : 'danger'"
+            />
+          </div>
+          <p class="category">{{ item.category }}</p>
+          <p class="price">{{ item.price | currency }}</p>
+          <div class="menu-actions">
+            <app-btn variant="secondary" size="sm" (click)="openEdit(item)">Edit</app-btn>
+            <app-btn variant="danger" size="sm" (click)="openDelete(item)">Delete</app-btn>
+          </div>
+        </div>
+      </article>
+    }
+  </div>
+}
+
+<app-modal [open]="showModal()" [title]="editingItem() ? 'Edit Menu Item' : 'Add Menu Item'" (closed)="showModal.set(false)">
+  <form [formGroup]="form">
+    <div class="form-field">
+      <label>Name *</label>
+      <input formControlName="name" placeholder="e.g. Vanilla Latte" />
+      @if (form.controls.name.touched && form.controls.name.invalid) {
+        <span class="error">Name is required.</span>
+      }
+    </div>
+    <div class="form-field">
+      <label>Category *</label>
+      <input formControlName="category" placeholder="e.g. Coffee, Tea" />
+    </div>
+    <div class="form-field">
+      <label>Price *</label>
+      <input type="number" step="0.01" formControlName="price" />
+      @if (form.controls.price.touched && form.controls.price.invalid) {
+        <span class="error">Enter a valid price.</span>
+      }
+    </div>
+    <div class="form-field checkbox-field">
+      <label>
+        <input type="checkbox" formControlName="isAvailable" />
+        Available for ordering
+      </label>
+    </div>
+  </form>
+  <div modal-footer>
+    <app-btn variant="secondary" (click)="showModal.set(false)">Cancel</app-btn>
+    <app-btn [loading]="saving()" (click)="save()">Save Item</app-btn>
+  </div>
+</app-modal>
+
+<app-modal [open]="showDeleteModal()" title="Delete Menu Item?" (closed)="showDeleteModal.set(false)">
+  <p>Remove <strong>{{ deletingItem()?.name }}</strong> from the menu?</p>
+  <div modal-footer>
+    <app-btn variant="secondary" (click)="showDeleteModal.set(false)">Cancel</app-btn>
+    <app-btn variant="danger" (click)="confirmDelete()">Delete</app-btn>
+  </div>
+</app-modal>

@@ -1,0 +1,69 @@
+@if (loading()) {
+  <app-skeleton />
+} @else if (order(); as o) {
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Order #{{ o.id }}</h1>
+      <p class="page-subtitle">Placed on {{ o.createdAt | date: 'full' }}</p>
+    </div>
+    <div class="page-actions">
+      <app-btn variant="secondary" link="/orders">← Back to Orders</app-btn>
+      <app-btn variant="danger" (click)="showDeleteModal.set(true)">Cancel Order</app-btn>
+    </div>
+  </div>
+
+  <div class="details-grid">
+    <app-card title="Customer">
+      <div class="info-block">
+        <p><strong>{{ o.customerName }}</strong></p>
+        <p class="muted">Customer ID: #{{ o.customerId }}</p>
+        <p class="muted">Take away: {{ o.isTakeAway ? 'Yes' : 'No' }}</p>
+        <app-badge [label]="o.status" variant="info" />
+      </div>
+    </app-card>
+
+    <app-card title="Order Total">
+      <p class="grand-total">{{ o.totalAmount | currency }}</p>
+      <p class="muted">{{ o.items.length }} item(s)</p>
+    </app-card>
+  </div>
+
+  <app-card title="Ordered Items">
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of o.items; track item.menuItemId) {
+            <tr>
+              <td>{{ item.menuItemName }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.unitPrice | currency }}</td>
+              <td>{{ item.subTotal | currency }}</td>
+            </tr>
+          }
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3"><strong>Grand Total</strong></td>
+            <td><strong>{{ o.totalAmount | currency }}</strong></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </app-card>
+}
+
+<app-modal [open]="showDeleteModal()" title="Cancel this order?" (closed)="showDeleteModal.set(false)">
+  <p>This will permanently cancel order #{{ order()?.id }}.</p>
+  <div modal-footer>
+    <app-btn variant="secondary" (click)="showDeleteModal.set(false)">Keep Order</app-btn>
+    <app-btn variant="danger" (click)="confirmDelete()">Cancel Order</app-btn>
+  </div>
+</app-modal>

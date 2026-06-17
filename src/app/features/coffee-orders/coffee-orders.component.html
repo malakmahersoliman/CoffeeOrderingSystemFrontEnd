@@ -1,0 +1,75 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Coffee Orders</h1>
+    <p class="page-subtitle">Track every cup served and every order placed.</p>
+  </div>
+  <div class="page-actions">
+    <app-search-input
+      placeholder="Search by order ID or customer..."
+      [value]="search()"
+      (valueChange)="search.set($event)"
+    />
+    <app-btn link="/create-order">+ New Order</app-btn>
+  </div>
+</div>
+
+<div class="filters-row">
+  <select [value]="customerFilter()" (change)="customerFilter.set($any($event.target).value)">
+    <option value="all">All Customers</option>
+    @for (c of customers(); track c.id) {
+      <option [value]="c.id">{{ c.fullName }}</option>
+    }
+  </select>
+</div>
+
+@if (loading()) {
+  <app-skeleton />
+} @else if (filtered().length === 0) {
+  <app-empty-state
+    icon="receipt"
+    title="No coffee orders yet"
+    message="No coffee orders yet. Start by creating your first order."
+  >
+    <app-btn link="/create-order">Create Order</app-btn>
+  </app-empty-state>
+} @else {
+  <div class="table-wrap card-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Items</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of filtered(); track order.id) {
+          <tr>
+            <td><a [routerLink]="['/orders', order.id]">#{{ order.id }}</a></td>
+            <td>{{ order.customerName }}</td>
+            <td>{{ order.items.length }}</td>
+            <td>{{ order.totalAmount | currency }}</td>
+            <td><app-badge [label]="order.status" variant="info" /></td>
+            <td>{{ order.createdAt | date: 'medium' }}</td>
+            <td class="actions">
+              <app-btn variant="secondary" size="sm" [link]="'/orders/' + order.id">View</app-btn>
+              <app-btn variant="danger" size="sm" (click)="openDelete(order)">Cancel</app-btn>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+<app-modal [open]="showDeleteModal()" title="Cancel Order?" (closed)="showDeleteModal.set(false)">
+  <p>Cancel order <strong>#{{ deletingOrder()?.id }}</strong> for {{ deletingOrder()?.customerName }}?</p>
+  <div modal-footer>
+    <app-btn variant="secondary" (click)="showDeleteModal.set(false)">Keep Order</app-btn>
+    <app-btn variant="danger" (click)="confirmDelete()">Cancel Order</app-btn>
+  </div>
+</app-modal>

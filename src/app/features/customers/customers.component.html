@@ -1,0 +1,81 @@
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Customers</h1>
+    <p class="page-subtitle">Manage your regulars and new visitors.</p>
+  </div>
+  <div class="page-actions">
+    <app-search-input placeholder="Search customers..." [value]="search()" (valueChange)="search.set($event)" />
+    <app-btn (click)="openAdd()">+ Add Customer</app-btn>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-skeleton />
+} @else if (filtered().length === 0) {
+  <app-empty-state
+    icon="users"
+    title="No customers found"
+    message="Click Add Customer to create your first customer record."
+  >
+    <app-btn (click)="openAdd()">Add Customer</app-btn>
+  </app-empty-state>
+} @else {
+  <div class="table-wrap card-table">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Phone</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (customer of filtered(); track customer.id) {
+          <tr>
+            <td>#{{ customer.id }}</td>
+            <td>
+              <strong>{{ customer.fullName }}</strong>
+            </td>
+            <td>{{ customer.phoneNumber }}</td>
+            <td class="actions">
+              <app-btn variant="ghost" size="sm" (click)="openEdit(customer)">Edit</app-btn>
+              <app-btn variant="danger" size="sm" (click)="openDelete(customer)">Delete</app-btn>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+<app-modal [open]="showModal()" [title]="editingCustomer() ? 'Edit Customer' : 'Add Customer'" (closed)="showModal.set(false)">
+  <form [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-field">
+      <label for="fullName">Full Name *</label>
+      <input id="fullName" formControlName="fullName" placeholder="e.g. Alice Johnson" />
+      @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+        <span class="error">Full name is required.</span>
+      }
+    </div>
+    <div class="form-field">
+      <label for="phone">Phone Number *</label>
+      <input id="phone" formControlName="phoneNumber" placeholder="e.g. 555-0100" />
+      @if (form.controls.phoneNumber.touched && form.controls.phoneNumber.invalid) {
+        <span class="error">Phone number is required.</span>
+      }
+    </div>
+  </form>
+  <div modal-footer>
+    <app-btn variant="secondary" (click)="showModal.set(false)">Cancel</app-btn>
+    <app-btn [loading]="saving()" (click)="save()">Save Customer</app-btn>
+  </div>
+</app-modal>
+
+<app-modal [open]="showDeleteModal()" title="Delete Customer?" (closed)="showDeleteModal.set(false)">
+  <p>Are you sure you want to delete <strong>{{ deletingCustomer()?.fullName }}</strong>? This cannot be undone.</p>
+  <div modal-footer>
+    <app-btn variant="secondary" (click)="showDeleteModal.set(false)">Cancel</app-btn>
+    <app-btn variant="danger" (click)="confirmDelete()">Delete</app-btn>
+  </div>
+</app-modal>

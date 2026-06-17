@@ -1,0 +1,98 @@
+<div class="welcome-banner">
+  <div>
+    <p class="welcome-kicker">Welcome back</p>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">A simple overview of customers, menu items, and orders.</p>
+  </div>
+</div>
+
+@if (loading()) {
+  <app-skeleton />
+} @else {
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon"><app-icon name="users" /></div>
+      <div>
+        <p class="stat-label">Total Customers</p>
+        <h3>{{ customers() }}</h3>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><app-icon name="cup" /></div>
+      <div>
+        <p class="stat-label">Menu Items</p>
+        <h3>{{ menuItems().length }}</h3>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><app-icon name="check" /></div>
+      <div>
+        <p class="stat-label">Available Items</p>
+        <h3>{{ availableCount() }}</h3>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon"><app-icon name="receipt" /></div>
+      <div>
+        <p class="stat-label">Today's Orders</p>
+        <h3>{{ todaysOrders() }}</h3>
+      </div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="stat-icon"><app-icon name="money" /></div>
+      <div>
+        <p class="stat-label">Total Revenue</p>
+        <h3>{{ totalRevenue() | currency }}</h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <app-card title="Recent Orders">
+      @if (recentOrders().length === 0) {
+        <p class="muted">No orders yet. Go to <a routerLink="/create-order">Create Order</a> to add one.</p>
+      } @else {
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of recentOrders(); track order.id) {
+                <tr>
+                  <td><a [routerLink]="['/orders', order.id]">#{{ order.id }}</a></td>
+                  <td>{{ order.customerName }}</td>
+                  <td>{{ order.totalAmount | currency }}</td>
+                  <td><app-badge [label]="order.status" variant="info" /></td>
+                  <td>{{ order.createdAt | date: 'short' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </app-card>
+
+    <app-card title="Popular Menu Items">
+      @if (popularItems().length === 0) {
+        <p class="muted">Popular items show up here after customers place orders.</p>
+      } @else {
+        <ul class="popular-list">
+          @for (item of popularItems(); track item.name; let i = $index) {
+            <li>
+              <span class="rank">{{ i + 1 }}</span>
+              <span class="name">{{ item.name }}</span>
+              <span class="qty">{{ item.qty }} sold</span>
+            </li>
+          }
+        </ul>
+      }
+    </app-card>
+  </div>
+}

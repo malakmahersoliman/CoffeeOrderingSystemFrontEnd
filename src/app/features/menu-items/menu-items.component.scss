@@ -1,0 +1,102 @@
+.filters-row select {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.menu-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.menu-image {
+  height: 90px;
+  display: grid;
+  place-items: center;
+  color: var(--primary);
+  background: var(--surface-soft);
+  border-bottom: 1px solid var(--border);
+}
+
+.menu-body {
+  padding: 0.9rem 1rem 1rem;
+}
+
+.menu-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+
+  h3 {
+    font-size: 1rem;
+  }
+}
+
+.category {
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  margin-bottom: 0.25rem;
+}
+
+.price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+}
+
+.menu-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.form-field {
+  margin-bottom: 0.9rem;
+
+  label {
+    display: block;
+    font-size: 0.84rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    outline: none;
+
+    &:focus {
+      border-color: var(--primary);
+    }
+  }
+
+  .error {
+    display: block;
+    color: var(--danger);
+    font-size: 0.78rem;
+    margin-top: 0.3rem;
+  }
+}
+
+.checkbox-field label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+}
